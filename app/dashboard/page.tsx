@@ -2,7 +2,7 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4 md:p-0 justify-items-center px-4">
       <h1 className="text-2xl font-bold mb-4 my-8">
-        Welcome to the Reconcile Agent Dashboard
+        Reconcile Agent Dashboard
       </h1>
       <p className="text-gray-600 mb-8">
         Reconcile Agent is a platform that helps you manage your finances.
