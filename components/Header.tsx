@@ -1,13 +1,3 @@
-// import React from 'react'
-
-// const Header = () => {
-//   return (
-//     <h1 className="text-4xl font-bold text-center">Header</h1>
-//   )
-// }
-
-// export default Header
-
 "use client";
 
 import Link from "next/link";
@@ -21,12 +11,11 @@ function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Left */}
           <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-4">
-              
-              <h1 className="text-xl font-semibold pl-2">
-                ReconcileAi
-              </h1>
-            </Link>
+          <Link href="/dashboard" className="flex items-center gap-4">
+                  <div className="text-xl font-bold mb-4 my-8 pl-4">
+                    Reconcile Agent
+                  </div>
+                </Link>
           </div>
 
           {/* Right */}
@@ -35,22 +24,21 @@ function Header() {
               <Link href="/manage-plan">
                 <Button
                   variant="outline"
-                  className="mr-4 bg-gradient-to-r from-blue-600 to-blue-400 text-transparent bg-clip-text"
+                  className="mr-4 "
                 >
                   Manage Plan
                 </Button>
               </Link>
 
-              <div className="p-2 w-10 h-10 flex items-center justify-center rounded-full border bg-blue-100 border-blue-200">
+              <div className="p-2 w-10 h-10 flex items-center justify-center rounded-full border bg-blue-100 border-blue-200 mr-4 ">
                 <UserButton />
               </div>
             </SignedIn>
 
             <SignedOut>
               <SignInButton mode="modal">
-                <Button
-                  variant="ghost"
-                  className="bg-gradient-to-r from-blue-600 to-blue-400 text-transparent bg-clip-text"
+                <Button     variant="outline"
+                  className="mr-4"
                 >
                   Sign In
                 </Button>
