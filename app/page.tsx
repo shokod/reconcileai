@@ -410,7 +410,7 @@ export default function LandingPage() {
                           <Star key={i} className="h-5 w-5 fill-primary text-primary" />
                         ))}
                     </div>
-                    <p className="text-gray-500">"{testimonial.quote}"</p>
+                    <p className="text-gray-500">`&quot;`{testimonial.quote}`&quot;`</p>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="h-10 w-10 overflow-hidden rounded-full">
