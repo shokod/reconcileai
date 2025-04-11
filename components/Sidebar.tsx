@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/tooltip";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: Home },
+  { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Uploads", href: "/dashboard/uploads", icon: UploadCloud },
   { name: "Reconciliation", href: "/dashboard/reconciliation", icon: CheckCircle },
   { name: "Reports", href: "/dashboard/reports", icon: File },

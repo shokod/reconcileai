@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   FileTextIcon,
   DownloadIcon,
@@ -16,18 +16,30 @@ import {
   FileIcon as FilePdfIcon,
   SearchIcon,
   SlidersHorizontalIcon,
-} from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ReportPreview } from "@/components/report-preview"
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ReportPreview } from "@/components/report-review";
+import { format } from "date-fns"
+import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+
 
 export default function ReportsPage() {
-  const [startDate, setStartDate] = useState("")
-  const [endDate, setEndDate] = useState("")
-  const [selectedReport, setSelectedReport] = useState<number | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [reportType, setReportType] = useState("all")
-  const [exportFormat, setExportFormat] = useState("pdf")
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+  const [selectedReport, setSelectedReport] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [reportType, setReportType] = useState("all");
+  const [exportFormat, setExportFormat] = useState("pdf");
+
 
   const reports = [
     {
@@ -81,7 +93,8 @@ export default function ReportsPage() {
     {
       id: 7,
       title: "Annual Financial Summary",
-      description: "Year-end summary of all financial reconciliation activities",
+      description:
+        "Year-end summary of all financial reconciliation activities",
       date: "2024",
       type: "annual",
       icon: FileTextIcon,
@@ -102,12 +115,12 @@ export default function ReportsPage() {
       type: "exception",
       icon: FileTextIcon,
     },
-  ]
+  ];
 
   const filteredReports = reports.filter((report) => {
     // Filter by type
     if (reportType !== "all" && report.type !== reportType) {
-      return false
+      return false;
     }
 
     // Filter by search term
@@ -116,30 +129,32 @@ export default function ReportsPage() {
       !report.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !report.description.toLowerCase().includes(searchTerm.toLowerCase())
     ) {
-      return false
+      return false;
     }
 
-    return true
-  })
+    return true;
+  });
 
   const handlePrint = () => {
-    window.print()
-  }
+    window.print();
+  };
 
   const handleExport = (format: string) => {
     // In a real app, this would trigger an API call to generate the export
-    console.log(`Exporting report in ${format} format`)
+    console.log(`Exporting report in ${format} format`);
     // Simulate download
     setTimeout(() => {
-      alert(`Report exported as ${format.toUpperCase()}`)
-    }, 1000)
-  }
+      alert(`Report exported as ${format.toUpperCase()}`);
+    }, 1000);
+  };
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
-        <p className="text-muted-foreground">View, customize, and export reconciliation reports</p>
+        <p className="text-muted-foreground">
+          View, customize, and export reconciliation reports
+        </p>
       </div>
 
       <Card className="shadow-sm">
@@ -153,29 +168,57 @@ export default function ReportsPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Date Range</label>
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  placeholder="Start Date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full"
-                />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !startDate && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? (
+                      format(startDate, "PPP")
+                    ) : (
+                      <span>Start Date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">End Date</label>
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  placeholder="End Date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full"
-                />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !endDate && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Report Type</label>
@@ -187,7 +230,9 @@ export default function ReportsPage() {
                   <SelectItem value="all">All Reports</SelectItem>
                   <SelectItem value="summary">Summary Reports</SelectItem>
                   <SelectItem value="analysis">Analysis Reports</SelectItem>
-                  <SelectItem value="unmatched">Unmatched Transactions</SelectItem>
+                  <SelectItem value="unmatched">
+                    Unmatched Transactions
+                  </SelectItem>
                   <SelectItem value="daily">Daily Reports</SelectItem>
                   <SelectItem value="trend">Trend Reports</SelectItem>
                   <SelectItem value="audit">Audit Reports</SelectItem>
@@ -231,7 +276,10 @@ export default function ReportsPage() {
             <CardContent>
               <p className="mb-4 text-sm">{report.description}</p>
               <div className="flex justify-between">
-                <ReportPreview reportType={report.type} reportTitle={report.title} />
+                <ReportPreview
+                  reportType={report.type}
+                  reportTitle={report.title}
+                />
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={handlePrint}>
                     <PrinterIcon className="mr-2 h-4 w-4" />
@@ -251,7 +299,9 @@ export default function ReportsPage() {
       {selectedReport && (
         <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{reports.find((r) => r.id === selectedReport)?.title} Preview</CardTitle>
+            <CardTitle>
+              {reports.find((r) => r.id === selectedReport)?.title} Preview
+            </CardTitle>
             <div className="flex gap-2">
               <Select value={exportFormat} onValueChange={setExportFormat}>
                 <SelectTrigger className="w-[130px]">
@@ -320,15 +370,24 @@ export default function ReportsPage() {
                     <ul className="mt-2 space-y-2 text-sm">
                       <li className="flex items-start gap-2">
                         <span className="mt-0.5 h-2 w-2 rounded-full bg-green-500" />
-                        <span>Overall reconciliation accuracy improved by 1.2% compared to previous month</span>
+                        <span>
+                          Overall reconciliation accuracy improved by 1.2%
+                          compared to previous month
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="mt-0.5 h-2 w-2 rounded-full bg-amber-500" />
-                        <span>23 unmatched transactions identified, primarily due to timing differences</span>
+                        <span>
+                          23 unmatched transactions identified, primarily due to
+                          timing differences
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="mt-0.5 h-2 w-2 rounded-full bg-blue-500" />
-                        <span>Bank fees totaling $245.75 were not recorded in the POS system</span>
+                        <span>
+                          Bank fees totaling $245.75 were not recorded in the
+                          POS system
+                        </span>
                       </li>
                     </ul>
                   </div>
@@ -341,11 +400,21 @@ export default function ReportsPage() {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b bg-muted/50">
-                          <th className="px-4 py-3 text-left text-sm font-medium">Date</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium">Description</th>
-                          <th className="px-4 py-3 text-right text-sm font-medium">POS Amount</th>
-                          <th className="px-4 py-3 text-right text-sm font-medium">Bank Amount</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">Status</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium">
+                            Date
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-medium">
+                            Description
+                          </th>
+                          <th className="px-4 py-3 text-right text-sm font-medium">
+                            POS Amount
+                          </th>
+                          <th className="px-4 py-3 text-right text-sm font-medium">
+                            Bank Amount
+                          </th>
+                          <th className="px-4 py-3 text-center text-sm font-medium">
+                            Status
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -364,8 +433,20 @@ export default function ReportsPage() {
                             bank: "$780.50",
                             status: "Matched",
                           },
-                          { date: "2025-03-04", desc: "Sale #12347", pos: "$325.75", bank: "-", status: "Missing" },
-                          { date: "2025-03-04", desc: "Bank Fee", pos: "-", bank: "$35.00", status: "Unmatched" },
+                          {
+                            date: "2025-03-04",
+                            desc: "Sale #12347",
+                            pos: "$325.75",
+                            bank: "-",
+                            status: "Missing",
+                          },
+                          {
+                            date: "2025-03-04",
+                            desc: "Bank Fee",
+                            pos: "-",
+                            bank: "$35.00",
+                            status: "Unmatched",
+                          },
                           {
                             date: "2025-03-03",
                             desc: "Sale #12348",
@@ -391,8 +472,12 @@ export default function ReportsPage() {
                           <tr key={i} className="border-b">
                             <td className="px-4 py-3 text-sm">{item.date}</td>
                             <td className="px-4 py-3 text-sm">{item.desc}</td>
-                            <td className="px-4 py-3 text-right text-sm">{item.pos}</td>
-                            <td className="px-4 py-3 text-right text-sm">{item.bank}</td>
+                            <td className="px-4 py-3 text-right text-sm">
+                              {item.pos}
+                            </td>
+                            <td className="px-4 py-3 text-right text-sm">
+                              {item.bank}
+                            </td>
                             <td className="px-4 py-3 text-center">
                               <span
                                 className={`rounded-full px-2 py-1 text-xs font-medium ${
@@ -429,8 +514,14 @@ export default function ReportsPage() {
                       <div className="h-60 w-full">
                         <div className="flex h-full flex-col justify-end">
                           <div className="flex h-full items-end gap-1 pb-6">
-                            {[65, 72, 88, 75, 98, 86, 79, 92, 85, 78, 94, 82, 88, 75, 98].map((value, i) => (
-                              <div key={i} className="group relative flex w-full flex-col items-center">
+                            {[
+                              65, 72, 88, 75, 98, 86, 79, 92, 85, 78, 94, 82,
+                              88, 75, 98,
+                            ].map((value, i) => (
+                              <div
+                                key={i}
+                                className="group relative flex w-full flex-col items-center"
+                              >
                                 <div className="absolute -top-8 hidden rounded bg-black px-2 py-1 text-xs text-white group-hover:block dark:bg-white dark:text-black">
                                   {value}
                                 </div>
@@ -460,7 +551,9 @@ export default function ReportsPage() {
                           <div className="absolute -left-3 -bottom-3 h-8 w-8 rounded-full bg-red-500"></div>
                           <div className="absolute -left-3 -top-3 h-8 w-8 rounded-full bg-amber-500"></div>
                           <div className="text-2xl font-bold">98.2%</div>
-                          <div className="text-xs text-muted-foreground">Match Rate</div>
+                          <div className="text-xs text-muted-foreground">
+                            Match Rate
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -480,12 +573,21 @@ export default function ReportsPage() {
                     <div className="grid gap-6 md:grid-cols-2">
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Report Title</label>
-                          <Input defaultValue={reports.find((r) => r.id === selectedReport)?.title} />
+                          <label className="text-sm font-medium">
+                            Report Title
+                          </label>
+                          <Input
+                            defaultValue={
+                              reports.find((r) => r.id === selectedReport)
+                                ?.title
+                            }
+                          />
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Date Range</label>
+                          <label className="text-sm font-medium">
+                            Date Range
+                          </label>
                           <div className="flex gap-2">
                             <Input type="date" defaultValue="2025-03-01" />
                             <Input type="date" defaultValue="2025-03-31" />
@@ -493,29 +595,50 @@ export default function ReportsPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Include Sections</label>
+                          <label className="text-sm font-medium">
+                            Include Sections
+                          </label>
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                              <input type="checkbox" id="summary" defaultChecked />
+                              <input
+                                type="checkbox"
+                                id="summary"
+                                defaultChecked
+                              />
                               <label htmlFor="summary" className="text-sm">
                                 Summary
                               </label>
                             </div>
                             <div className="flex items-center gap-2">
-                              <input type="checkbox" id="details" defaultChecked />
+                              <input
+                                type="checkbox"
+                                id="details"
+                                defaultChecked
+                              />
                               <label htmlFor="details" className="text-sm">
                                 Transaction Details
                               </label>
                             </div>
                             <div className="flex items-center gap-2">
-                              <input type="checkbox" id="charts" defaultChecked />
+                              <input
+                                type="checkbox"
+                                id="charts"
+                                defaultChecked
+                              />
                               <label htmlFor="charts" className="text-sm">
                                 Charts & Graphs
                               </label>
                             </div>
                             <div className="flex items-center gap-2">
-                              <input type="checkbox" id="recommendations" defaultChecked />
-                              <label htmlFor="recommendations" className="text-sm">
+                              <input
+                                type="checkbox"
+                                id="recommendations"
+                                defaultChecked
+                              />
+                              <label
+                                htmlFor="recommendations"
+                                className="text-sm"
+                              >
                                 Recommendations
                               </label>
                             </div>
@@ -525,37 +648,55 @@ export default function ReportsPage() {
 
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Report Format</label>
+                          <label className="text-sm font-medium">
+                            Report Format
+                          </label>
                           <Select defaultValue="detailed">
                             <SelectTrigger>
                               <SelectValue placeholder="Select format" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="summary">Summary Only</SelectItem>
+                              <SelectItem value="summary">
+                                Summary Only
+                              </SelectItem>
                               <SelectItem value="detailed">Detailed</SelectItem>
-                              <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                              <SelectItem value="comprehensive">
+                                Comprehensive
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Sort Transactions By</label>
+                          <label className="text-sm font-medium">
+                            Sort Transactions By
+                          </label>
                           <Select defaultValue="date">
                             <SelectTrigger>
                               <SelectValue placeholder="Select sort order" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="date">Date (Newest First)</SelectItem>
-                              <SelectItem value="date-asc">Date (Oldest First)</SelectItem>
-                              <SelectItem value="amount">Amount (Highest First)</SelectItem>
-                              <SelectItem value="amount-asc">Amount (Lowest First)</SelectItem>
+                              <SelectItem value="date">
+                                Date (Newest First)
+                              </SelectItem>
+                              <SelectItem value="date-asc">
+                                Date (Oldest First)
+                              </SelectItem>
+                              <SelectItem value="amount">
+                                Amount (Highest First)
+                              </SelectItem>
+                              <SelectItem value="amount-asc">
+                                Amount (Lowest First)
+                              </SelectItem>
                               <SelectItem value="status">Status</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Additional Options</label>
+                          <label className="text-sm font-medium">
+                            Additional Options
+                          </label>
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
                               <input type="checkbox" id="logo" defaultChecked />
@@ -564,13 +705,21 @@ export default function ReportsPage() {
                               </label>
                             </div>
                             <div className="flex items-center gap-2">
-                              <input type="checkbox" id="page-numbers" defaultChecked />
+                              <input
+                                type="checkbox"
+                                id="page-numbers"
+                                defaultChecked
+                              />
                               <label htmlFor="page-numbers" className="text-sm">
                                 Show Page Numbers
                               </label>
                             </div>
                             <div className="flex items-center gap-2">
-                              <input type="checkbox" id="timestamp" defaultChecked />
+                              <input
+                                type="checkbox"
+                                id="timestamp"
+                                defaultChecked
+                              />
                               <label htmlFor="timestamp" className="text-sm">
                                 Include Generation Timestamp
                               </label>
@@ -603,24 +752,39 @@ export default function ReportsPage() {
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Set up automated reports to be generated and delivered on a schedule.
+              Set up automated reports to be generated and delivered on a
+              schedule.
             </p>
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b">
-                    <th className="px-4 py-3 text-left text-sm font-medium">Report Name</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Frequency</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Recipients</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Format</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium">Next Run</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">Actions</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Report Name
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Frequency
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Recipients
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Format
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">
+                      Next Run
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-medium">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b">
-                    <td className="px-4 py-3 text-sm">Daily Reconciliation Summary</td>
+                    <td className="px-4 py-3 text-sm">
+                      Daily Reconciliation Summary
+                    </td>
                     <td className="px-4 py-3 text-sm">Daily</td>
                     <td className="px-4 py-3 text-sm">finance@example.com</td>
                     <td className="px-4 py-3 text-sm">PDF</td>
@@ -637,7 +801,9 @@ export default function ReportsPage() {
                     </td>
                   </tr>
                   <tr className="border-b">
-                    <td className="px-4 py-3 text-sm">Weekly Exception Report</td>
+                    <td className="px-4 py-3 text-sm">
+                      Weekly Exception Report
+                    </td>
                     <td className="px-4 py-3 text-sm">Weekly</td>
                     <td className="px-4 py-3 text-sm">team@example.com</td>
                     <td className="px-4 py-3 text-sm">Excel</td>
@@ -654,9 +820,13 @@ export default function ReportsPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 text-sm">Monthly Financial Summary</td>
+                    <td className="px-4 py-3 text-sm">
+                      Monthly Financial Summary
+                    </td>
                     <td className="px-4 py-3 text-sm">Monthly</td>
-                    <td className="px-4 py-3 text-sm">management@example.com</td>
+                    <td className="px-4 py-3 text-sm">
+                      management@example.com
+                    </td>
                     <td className="px-4 py-3 text-sm">PDF</td>
                     <td className="px-4 py-3 text-sm">April 1, 2025</td>
                     <td className="px-4 py-3 text-center">
@@ -681,6 +851,5 @@ export default function ReportsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

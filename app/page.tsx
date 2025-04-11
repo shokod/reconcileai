@@ -17,11 +17,6 @@ export default function Home() {
           Reconcile•Agent
         </span>
       </div>
-     
-       {/* Coming Soon Card positioned below the large text */}
-       {/* <div className="relative mt-2 md:mt-[65vh] lg:mt-[70vh] z-10 max-w-md mx-auto">
-        <ComingSoonCard />
-      </div> */}
       
     </div>
   );
