@@ -11,21 +11,38 @@ function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Left */}
           <div className="flex items-center justify-between h-16">
-          <Link href="/dashboard" className="flex items-center gap-4">
-                  <div className="text-xl font-bold mb-4 my-8 pl-4">
-                    Reconcile Agent
-                  </div>
-                </Link>
+            {/* <Link href="/dashboard" className="flex items-center gap-4">
+              <div className="text-xl font-bold mb-4 my-8 pl-4">
+                Reconcile Agent
+              </div>
+            </Link> */}
           </div>
 
           {/* Right */}
           <div className="flex items-center gap-4">
             <SignedIn>
-              <Link href="/manage-plan">
-                <Button
-                  variant="outline"
-                  className="mr-4 "
-                >
+              {/* <Link href="/dashboard/uploads">
+                <Button variant="ghost" className="mr-4 ">
+                  Upload
+                </Button>
+              </Link>
+              <Link href="/dashboard/reconciliations">
+                <Button variant="ghost" className="mr-4 ">
+                  Reconcile
+                </Button>
+              </Link>
+              <Link href="/dashboard/analytics">
+                <Button variant="ghost" className="mr-4 ">
+                  Analytics
+                </Button>
+              </Link>
+              <Link href="/dashboard/reports">
+                <Button variant="ghost" className="mr-4 ">
+                  Reports
+                </Button>
+              </Link> */}
+              <Link href="/dashboard/manage-plan">
+                <Button variant="outline" className="mr-4 ">
                   Manage Plan
                 </Button>
               </Link>
@@ -37,9 +54,7 @@ function Header() {
 
             <SignedOut>
               <SignInButton mode="modal">
-                <Button     variant="outline"
-                  className="mr-4"
-                >
+                <Button variant="outline" className="mr-4">
                   Sign In
                 </Button>
               </SignInButton>

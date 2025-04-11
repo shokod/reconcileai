@@ -28,24 +28,19 @@ import {
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
-  { name: "Uploads", href: "/uploads", icon: UploadCloud },
-  { name: "Reconciliation", href: "/reconcile", icon: CheckCircle },
-  { name: "Reports", href: "/reports", icon: File },
-  { name: "Analytics", href: "/analytics", icon: BarChart2 },
-  //   { name: "Organization", href: "/organization", icon: Building2 },
-  //   { name: "Projects", href: "/projects", icon: Folder },
-  { name: "Report Builder", href: "/report-builder", icon: Wallet },
-  { name: "Export Center", href: "/export-center", icon: DownloadCloud },
-  { name: "Payments", href: "/payments", icon: CreditCard },
-  //   { name: "Members", href: "/members", icon: Users2 },
-  //   { name: "Permissions", href: "/permissions", icon: Shield },
-  //   { name: "Chat", href: "/chat", icon: MessagesSquare },
-  //   { name: "Meetings", href: "/meetings", icon: Video },
+  { name: "Uploads", href: "/dashboard/uploads", icon: UploadCloud },
+  { name: "Reconciliation", href: "/dashboard/reconciliation", icon: CheckCircle },
+  { name: "Reports", href: "/dashboard/reports", icon: File },
+  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart2 },
+  { name: "Report Builder", href: "/dashboard/report-builder", icon: Wallet },
+  { name: "Export Center", href: "/dashboard/export-center", icon: DownloadCloud },
+  { name: "Payments", href: "/dashboard/payments", icon: CreditCard },
+  
 ];
 
 const bottomNavigation = [
-  { name: "Settings", href: "/settings", icon: Settings },
-  { name: "Help", href: "/help", icon: HelpCircle },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Help", href: "/dashboard/support", icon: HelpCircle },
 ];
 
 export function Sidebar() {
