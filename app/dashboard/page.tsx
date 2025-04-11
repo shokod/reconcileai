@@ -1,28 +1,3 @@
-// export default function Home() {
-//   return (
-//     <div className="relative min-h-[calc(100vh-8rem)]"> {/* Adjust based on header height */}
-//       <div className="container mx-auto p-4 md:p-6 justify-items-center">
-//         <h1 className="text-2xl font-bold mb-4 my-8">
-//           Reconcile Agent Dashboard
-//         </h1>
-//         <p className="text-gray-600 mb-8">
-//           Reconcile Agent is a platform that helps you manage your finances.
-//         </p>
-//       </div>
-
-//       {/* Absolute positioned element */}
-//       {/* <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-[20vw] font-bold leading-none sm:text-[15vw] md:text-[12vw] lg:text-[10vw] pointer-events-none">
-//         <span className="bg-gradient-to-b from-gray-200 to-gray-100/30 to-80% bg-clip-text text-transparent -tracking-wide">
-//           Reconcile•Agent
-//         </span>
-//         <span className="absolute inset-0 bg-gray-300/70 bg-clip-text text-transparent mix-blend-darken [text-shadow:0_1px_0_white] -tracking-wide">
-//           Reconcile•Agent
-//         </span>
-//       </div> */}
-      
-//     </div>
-//   );
-// }
 "use client"
 
 import type React from "react"
@@ -71,7 +46,7 @@ const MOCK_RECONCILIATIONS = [
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [reconciliations, setReconciliations] = useState(MOCK_RECONCILIATIONS)
+  const reconciliations = MOCK_RECONCILIATIONS
 
   useEffect(() => {
     // Show toast when dashboard is loaded

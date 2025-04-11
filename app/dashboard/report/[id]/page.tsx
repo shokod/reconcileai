@@ -58,8 +58,8 @@ const MOCK_REPORT = {
   ],
 }
 
-export default function ReportPage({ params }: { params: { id: string } }) {
-  const [report, setReport] = useState(MOCK_REPORT)
+export default function ReportPage() {
+  const report = MOCK_REPORT
 
   useEffect(() => {
     // Show toast when report is loaded

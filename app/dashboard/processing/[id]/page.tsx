@@ -174,7 +174,7 @@ export default function ProcessingPage({ params }: { params: { id: string } }) {
 
           <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
             <p>
-              This process typically takes 1-2 minutes. We're using AI to extract data from your files, identify
+              This process typically takes 1-2 minutes. We`&apos;`re using AI to extract data from your files, identify
               discrepancies, and generate a comprehensive report.
             </p>
           </div>

@@ -265,6 +265,8 @@ export default function ReportsPage() {
           <Card
             key={report.id}
             className={`shadow-sm transition-all ${selectedReport === report.id ? "ring-2 ring-primary" : ""}`}
+            onClick={() => setSelectedReport(report.id)}
+            style={{ cursor: "pointer" }}
           >
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-lg">

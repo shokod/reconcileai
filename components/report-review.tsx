@@ -5,16 +5,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { EyeIcon } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
- 
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 
 interface ReportPreviewProps {
   reportType: string
@@ -23,7 +13,7 @@ interface ReportPreviewProps {
 
 export function ReportPreview({ reportType, reportTitle }: ReportPreviewProps) {
   const [open, setOpen] = useState(false)
-  const [date, setDate] = React.useState<Date>()
+  // const [date, setDate] = React.useState<Date>()
 
   const getReportContent = () => {
     switch (reportType) {
