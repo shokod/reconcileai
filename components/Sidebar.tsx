@@ -34,7 +34,7 @@ const navigation = [
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart2 },
   { name: "Report Builder", href: "/dashboard/report-builder", icon: Wallet },
   { name: "Export Center", href: "/dashboard/export-center", icon: DownloadCloud },
-  { name: "Payments", href: "/dashboard/payments", icon: CreditCard },
+  { name: "Payments", href: "/dashboard/manage-plan", icon: CreditCard },
   
 ];
 

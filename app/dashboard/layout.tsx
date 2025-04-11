@@ -3,6 +3,7 @@ import ClientWrapper from "@/components/ClientWrapper";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/nextjs";
 import Header from "@/components/Header";
+import { Toaster } from "sonner";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Header should go here if you want it inside the main content area */}
           <Header />
           <ClientWrapper>
+          <Toaster position="top-right" richColors />
             <SignedIn>
               <div className="flex-1 overflow-auto">
                 <div className="container mx-auto p-6 max-w-7xl">
