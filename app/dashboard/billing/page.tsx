@@ -1,6 +1,6 @@
 import SchematicComponent from "@/components/schematic/SchematicComponent";
 
-function ManagePlan() {
+function Billing() {
   return (
     <div className="container xl:max-w-4xl mx-auto p-4 md:p-0 justify-items-center">
       <h1 className="text-2xl font-bold mb-4 my-8">Manage Your Plan</h1>
@@ -13,4 +13,4 @@ function ManagePlan() {
   );
 }
 
-export default ManagePlan;
+export default Billing;

@@ -10,8 +10,26 @@ export const convex = new ConvexReactClient(
 );
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
+  const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  
+  if (!clerkPublishableKey) {
+    throw new Error(
+      "Missing Clerk Publishable Key. Please add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env.local file."
+    );
+  }
+
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider 
+      publishableKey={clerkPublishableKey}
+      afterSignOutUrl="/"
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      appearance={{
+        variables: {
+          colorPrimary: "#000000"
+        }
+      }}
+    >
       <ConvexProviderWithClerk useAuth={useAuth} client={convex}>
         {children}
       </ConvexProviderWithClerk>

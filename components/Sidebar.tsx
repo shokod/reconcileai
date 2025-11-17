@@ -16,6 +16,7 @@ import {
   CheckCircle,
   DownloadCloud,
   File,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -23,19 +24,16 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  TooltipProvider,
 } from "@/components/ui/tooltip";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Uploads", href: "/dashboard/uploads", icon: UploadCloud },
-  { name: "Reconciliation", href: "/dashboard/reconciliation", icon: CheckCircle },
+  { name: "Upload Log", href: "/dashboard/upload", icon: UploadCloud },
+  { name: "Scans", href: "/dashboard/reconciliation", icon: ShieldCheck },
   { name: "Reports", href: "/dashboard/reports", icon: File },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart2 },
-  { name: "Report Builder", href: "/dashboard/report-builder", icon: Wallet },
-  { name: "Export Center", href: "/dashboard/export-center", icon: DownloadCloud },
-  { name: "Payments", href: "/dashboard/manage-plan", icon: CreditCard },
-  
+  { name: "AI Agents", href: "/dashboard/agents", icon: BarChart2 },
+  { name: "Billing", href: "/dashboard/manage-plan", icon: CreditCard },
+ 
 ];
 
 const bottomNavigation = [
@@ -87,56 +85,63 @@ export function Sidebar() {
   );
 
   return (
-    <TooltipProvider>
-      <>
-        <button
-          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-background rounded-md shadow-md"
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
+    <>
+      {/* Mobile overlay */}
+      {isMobileOpen && (
         <div
-          className={cn(
-            "flex flex-col bg-background transition-all duration-300 ease-in-out lg:static",
-            isCollapsed ? "w-[72px]" : "w-72",
-            isMobileOpen
-              ? "translate-x-0"
-              : "-translate-x-full lg:translate-x-0",
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      
+      {/* Mobile menu button */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-background rounded-md shadow-md border"
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        aria-label="Toggle sidebar"
+      >
+        <Menu className="h-6 w-6" />
+      </button>
+
+      <aside
+        className={cn(
+          "fixed left-0 top-0 h-screen flex flex-col bg-background border-r transition-all duration-300 ease-in-out z-40",
+          isCollapsed ? "w-[72px]" : "w-64",
+          isMobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0",
+        )}
+        data-collapsed={isCollapsed}
+      >
+          <div className={cn(
+          "flex items-center h-16 border-b border-border",
+          isCollapsed ? "justify-center px-2" : "justify-between px-4"
+        )}>
+          {!isCollapsed && (
+            <Link href="/dashboard" className="flex items-center">
+              <div className="text-lg font-semibold">
+                Reconcile Agent
+              </div>
+            </Link>
           )}
-        >
-          <div className="border-b border-border">
-            <div
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            <ChevronLeft
               className={cn(
-                "flex h-16 items-center gap-2 px-4",
-                isCollapsed && "justify-center px-2",
+                "h-4 w-4 transition-transform",
+                isCollapsed && "rotate-180",
               )}
-            >
-              {!isCollapsed && (
-                <Link href="/" className="flex items-center gap-4">
-                  <div className="text-xl font-bold mb-4 my-8 pl-4">
-                    Reconcile Agent
-                  </div>
-                </Link>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn("ml-auto h-8 w-8", isCollapsed && "ml-0")}
-                onClick={() => setIsCollapsed(!isCollapsed)}
-              >
-                <ChevronLeft
-                  className={cn(
-                    "h-4 w-4 transition-transform",
-                    isCollapsed && "rotate-180",
-                  )}
-                />
-                <span className="sr-only">
-                  {isCollapsed ? "Expand" : "Collapse"} Sidebar
-                </span>
-              </Button>
-            </div>
-          </div>
+            />
+            <span className="sr-only">
+              {isCollapsed ? "Expand" : "Collapse"} Sidebar
+            </span>
+          </Button>
+        </div>
           <div className="flex-1 overflow-auto flex flex-col justify-start">
             <nav className="space-y-1 px-2 py-4 shrink-0">
               {navigation.map((item) => (
@@ -151,8 +156,7 @@ export function Sidebar() {
               ))}
             </nav>
           </div>
-        </div>
+        </aside>
       </>
-    </TooltipProvider>
   );
 }

@@ -1,221 +1,273 @@
-"use client"
+// src/app/dashboard/page.tsx
+"use client";
 
-import type React from "react"
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  ShieldCheck,
+  Upload,
+  AlertCircle,
+  TrendingUp,
+  DollarSign,
+  Clock,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner"; // ← Sonner
+import Link from "next/link";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { FileText, Plus, Calendar, AlertTriangle, CheckCircle, Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { toast } from "sonner"
+export default function Dashboard() {
+  const { user, isLoaded: clerkLoaded } = useUser();
+  const router = useRouter();
 
-// Mock data for the dashboard
-const MOCK_RECONCILIATIONS = [
-  {
-    id: "rec-1",
-    createdAt: "2025-04-05T10:25:02.000Z",
-    status: "completed",
-    bankFileName: "bank-statement-apr-2025.pdf",
-    posFileName: "pos-data-apr-2025.csv",
-    discrepancies: 14,
-    totalTransactions: 156,
-  },
-  {
-    id: "rec-2",
-    createdAt: "2025-03-31T14:12:45.000Z",
-    status: "completed",
-    bankFileName: "bank-statement-mar-2025.pdf",
-    posFileName: "pos-data-mar-2025.csv",
-    discrepancies: 8,
-    totalTransactions: 142,
-  },
-  {
-    id: "rec-3",
-    createdAt: "2025-02-28T09:45:12.000Z",
-    status: "completed",
-    bankFileName: "bank-statement-feb-2025.pdf",
-    posFileName: "pos-data-feb-2025.csv",
-    discrepancies: 5,
-    totalTransactions: 128,
-  },
-]
+  const [isPro, setIsPro] = useState(false);
 
-export default function DashboardPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const reconciliations = MOCK_RECONCILIATIONS
+  // Convex: Get all scans for this user
+  const scans = useQuery(
+    api.scans.getUserScans, 
+    user?.id ? { userId: user.id } : "skip"
+  );
 
+  // Redirect if not signed in
   useEffect(() => {
-    // Show toast when dashboard is loaded
-    toast.info(`Showing ${reconciliations.length} reconciliation records`)
-  }, [reconciliations.length])
-
-  const filteredReconciliations = reconciliations.filter((rec) => {
-    const matchesSearch =
-      rec.bankFileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      rec.posFileName.toLowerCase().includes(searchQuery.toLowerCase())
-
-    const matchesStatus = statusFilter === "all" || rec.status === statusFilter
-
-    return matchesSearch && matchesStatus
-  })
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value
-    setSearchQuery(query)
-
-    if (query) {
-      toast.info(`Filtering by "${query}"`)
+    if (clerkLoaded && !user) {
+      router.push("/");
     }
+  }, [clerkLoaded, user, router]);
+
+  // Check Pro status
+  useEffect(() => {
+    if (user?.publicMetadata?.plan === "pro") {
+      setIsPro(true);
+    }
+  }, [user]);
+
+  // Loading state - show skeleton while Clerk is loading
+  if (!clerkLoaded) {
+    return <DashboardSkeleton />;
   }
 
-  const handleStatusFilter = (value: string) => {
-    setStatusFilter(value)
+  // Stats
+  const totalScans = scans?.length || 0;
+  const hallucinations = scans?.filter(s => 
+    s.content?.some((m: any) => m.hallucination)
+  ).length || 0;
+  const accuracy = totalScans > 0 
+    ? Math.round(((totalScans - hallucinations) / totalScans) * 100)
+    : 100;
+  const scansThisWeek = scans?.filter(s => {
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return s.createdAt > weekAgo;
+  }).length || 0;
 
-    if (value !== "all") {
-      toast.info(`Showing ${value} reconciliations`)
-    } else {
-      toast.info("Cleared status filter")
-    }
-  }
+  // Default to empty array if scans is still loading
+  const scansList = scans || [];
 
   return (
-    <div className="container py-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-500">Manage your reconciliations and view reports</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome back, {user?.firstName || "User"}!
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Monitor your AI support health in real-time.
+          </p>
         </div>
-        <Link href="/upload">
-          <Button
-            onClick={() => {
-              toast.info("You can upload new files for reconciliation")
-            }}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            New Reconciliation
+        <div className="flex gap-3">
+          <Button asChild className="bg-green-600 hover:bg-green-700">
+            <Link href="/dashboard/uploads" className="flex items-center gap-2">
+              <Upload className="w-4 h-4" />
+              Upload Log
+            </Link>
           </Button>
-        </Link>
+          {!isPro && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                toast.info("Upgrade to Pro for unlimited scans & reports!");
+                router.push("/dashboard/billing");
+              }}
+            >
+              <DollarSign className="w-4 h-4 mr-1" />
+              Upgrade to Pro
+            </Button>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Total Reconciliations</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Scans</CardTitle>
+            <ShieldCheck className="w-5 h-5 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{reconciliations.length}</div>
+            <div className="text-2xl font-bold">{totalScans}</div>
+            <p className="text-xs text-gray-500">All time</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Total Discrepancies Found</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Accuracy Rate</CardTitle>
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{reconciliations.reduce((sum, rec) => sum + rec.discrepancies, 0)}</div>
+            <div className="text-2xl font-bold">{accuracy}%</div>
+            <Progress value={accuracy} className="h-2 mt-2" />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Avg. Discrepancy Rate</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Hallucinations</CardTitle>
+            <AlertCircle className="w-5 h-5 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
-              {Math.round(
-                (reconciliations.reduce((sum, rec) => sum + rec.discrepancies, 0) /
-                  reconciliations.reduce((sum, rec) => sum + rec.totalTransactions, 0)) *
-                  100,
-              )}
-              %
-            </div>
+            <div className="text-2xl font-bold">{hallucinations}</div>
+            <p className="text-xs text-red-600">
+              {hallucinations > 0 
+                ? `-${(hallucinations / totalScans * 100).toFixed(1)}% from goal`
+                : "Perfect!"}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">This Week</CardTitle>
+            <Clock className="w-5 h-5 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{scansThisWeek}</div>
+            <p className="text-xs text-gray-500">Scans in last 7 days</p>
           </CardContent>
         </Card>
       </div>
 
+      {/* Recent Scans */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Reconciliations</CardTitle>
-          <CardDescription>View and manage your recent reconciliation reports</CardDescription>
-
-          <div className="flex flex-col md:flex-row gap-4 mt-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input placeholder="Search by filename..." className="pl-8" value={searchQuery} onChange={handleSearch} />
-            </div>
-            <Select value={statusFilter} onValueChange={handleStatusFilter}>
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center justify-between">
+            <CardTitle>Recent Scans</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/dashboard/scans">View all →</Link>
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {filteredReconciliations.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No reconciliations found</p>
-              </div>
-            ) : (
-              filteredReconciliations.map((reconciliation) => (
-                <div
-                  key={reconciliation.id}
-                  className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border rounded-lg"
-                >
-                  <div className="flex items-start gap-3 mb-4 md:mb-0">
-                    <div className="bg-blue-100 p-2 rounded-md">
-                      <FileText className="h-5 w-5 text-blue-700" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">
-                        {reconciliation.bankFileName} / {reconciliation.posFileName}
-                      </h3>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {new Date(reconciliation.createdAt).toLocaleDateString()}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <AlertTriangle className="h-3.5 w-3.5" />
-                          {reconciliation.discrepancies} discrepancies
-                        </span>
+          {scansList.length > 0 ? (
+            <div className="space-y-3">
+              {scansList.slice(0, 5).map((scan) => {
+                const halluCount = scan.content?.filter((m: any) => m.hallucination).length || 0;
+                const isRecent = Date.now() - scan.createdAt < 60 * 60 * 1000;
+
+                return (
+                  <div
+                    key={scan._id}
+                    className="flex items-center justify-between p-3 rounded-lg border bg-white hover:bg-gray-50 transition"
+                  >
+                    <div className="flex items-center gap-3">
+                      {isRecent && (
+                        <Badge variant="secondary" className="text-xs">NEW</Badge>
+                      )}
+                      <div>
+                        <p className="font-medium text-sm">{scan.fileName}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(scan.createdAt).toLocaleString()}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 w-full md:w-auto">
-                    <Badge variant={reconciliation.status === "completed" ? "success" : "outline"} className="md:mr-4">
-                      {reconciliation.status === "completed" && <CheckCircle className="mr-1 h-3 w-3" />}
-                      {reconciliation.status.charAt(0).toUpperCase() + reconciliation.status.slice(1)}
-                    </Badge>
-                    <Link href={`/reports/${reconciliation.id}`} className="w-full md:w-auto">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full md:w-auto"
-                        onClick={() => {
-                          toast.info(`Opening report for ${reconciliation.bankFileName}`)
-                        }}
-                      >
-                        View Report
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className={halluCount > 0 ? "text-red-600" : "text-green-600"}>
+                        {halluCount} hallucination{halluCount !== 1 ? "s" : ""}
+                      </span>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/scans/${scan._id}`}>View →</Link>
                       </Button>
-                    </Link>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <ShieldCheck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>No scans yet. Upload your first chat log!</p>
+              <Button
+                className="mt-3"
+                onClick={() => {
+                  router.push("/dashboard/uploads");
+                }}
+              >
+                Get Started
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pro CTA */}
+      {!isPro && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-600" />
+              Unlock Pro Features
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-700 mb-4">
+              Get unlimited scans, PDF reports, AI agent logs, and priority support.
+            </p>
+            <Button
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => router.push("/dashboard/billing")}
+            >
+              Upgrade Now – $49/mo
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// Skeleton Loader
+function DashboardSkeleton() {
+  return (
+    <div className="p-6 space-y-6">
+      <Skeleton className="h-10 w-64" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i}>
+            <CardHeader>
+              <Skeleton className="h-4 w-32" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-3 w-full mt-2" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-40" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-32 w-full" />
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

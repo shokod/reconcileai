@@ -1,20 +1,33 @@
 "use client";
 
-import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { BellDot } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 function Header() {
-  return (
-    <header className="sticky top-0 left-0 right-0 px-4 md:px-0 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
-      <div className="container mx-auto">
-        <div className="flex items-center justify-end h-16">
-          {/* Left */}
+  const pathname = usePathname();
+  const router = useRouter();
+  const isDashboard = pathname?.startsWith("/dashboard");
+  const { isSignedIn, isLoaded } = useAuth();
 
-          {/* Right */}
-          <div className="flex gap-4">
-            <SignedIn>
+  return (
+    <header className={`fixed top-0 right-0 z-50 transition-[left] duration-300 bg-white backdrop-blur-sm border-b border-gray-200 ${
+      isDashboard ? "left-0 lg:left-64" : "left-0"
+    }`}>
+      <div className="flex items-center justify-between h-16 px-6">
+        {/* Left - Logo/Brand */}
+        <Link href="/" className="flex items-center">
+          <div className="text-lg font-semibold text-gray-900">
+            Reconcile Agent
+          </div>
+        </Link>
+
+        {/* Right */}
+        <div className="flex items-center gap-3">
+          {isLoaded && isSignedIn ? (
+            <>
               <Link href="/dashboard/notifications">
                 <Button variant="ghost" size="icon" className="relative">
                   <BellDot className="h-5 w-5" />
@@ -24,24 +37,24 @@ function Header() {
               </Link>
 
               <Link href="/dashboard/manage-plan">
-                <Button variant="ghost" className="mr-4 ">
+                <Button variant="ghost">
                   Manage Plan
                 </Button>
               </Link>
 
-              <div className="p-2 w-10 h-10 flex items-center justify-center rounded-full border bg-blue-100 border-blue-200 mr-4 ">
+              <div className="p-2 w-10 h-10 flex items-center justify-center rounded-full border bg-blue-100 border-blue-200">
                 <UserButton />
               </div>
-            </SignedIn>
-
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="outline" className="mr-4">
-                  Sign In
-                </Button>
-              </SignInButton>
-            </SignedOut>
-          </div>
+            </>
+          ) : (
+            <Button 
+              variant="default" 
+              size="lg"
+              onClick={() => router.push('/sign-in')}
+            >
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
     </header>

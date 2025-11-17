@@ -8,26 +8,21 @@ import { Toaster } from "sonner";
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="min-h-screen flex bg-background">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          {/* Header should go here if you want it inside the main content area */}
+      <ClientWrapper>
+        <SignedIn>
           <Header />
-          <ClientWrapper>
+          <Sidebar />
           <Toaster position="top-right" richColors />
-            <SignedIn>
-              <div className="flex-1 overflow-auto">
-                <div className="container mx-auto p-6 max-w-7xl">
-                  <main className="w-full">{children}</main>
-                </div>
-              </div>
-            </SignedIn>
-            <SignedOut>
-              <RedirectToSignIn signInFallbackRedirectUrl="/dashboard" />
-            </SignedOut>
-          </ClientWrapper>
-        </div>
-      </div>
+          <main className="min-h-screen pt-16 transition-[margin] duration-300 lg:ml-64">
+            <div className="p-6">
+              {children}
+            </div>
+          </main>
+        </SignedIn>
+        <SignedOut>
+          <RedirectToSignIn signInFallbackRedirectUrl="/dashboard" />
+        </SignedOut>
+      </ClientWrapper>
     </TooltipProvider>
   );
 }
